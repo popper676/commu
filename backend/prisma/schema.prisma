@@ -1,0 +1,502 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== USER MODEL ====================
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  username      String    @unique
+  password      String
+  fullName      String
+  fullNameMm    String?
+  avatar        String?
+  bio           String?
+  bioMm         String?
+  phone         String?
+  verified      Boolean   @default(false)
+  
+  // Creator Account Features
+  isCreator        Boolean   @default(false)
+  creatorVerified  Boolean   @default(false)
+  creatorBio       String?
+  creatorBioMm     String?
+  websiteUrl       String?
+  socialLinks      Json?     // {facebook, twitter, instagram, etc}
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  refreshTokens     RefreshToken[]
+  communities       CommunityMember[]
+  createdCommunities Community[]      @relation("CommunityCreator")
+  messages          Message[]
+  posts             Post[]
+  comments          Comment[]
+  likes             Like[]
+  reactions         Reaction[]
+  shares            Share[]
+  files             File[]
+  readReceipts      ReadReceipt[]
+  createdChallenges Challenge[]           @relation("ChallengeCreator")
+  challengeSubmissions ChallengeSubmission[]
+  
+  // Creator Features
+  creatorRequests   CreatorRequest[]   @relation("CreatorRequests")
+  followers         Follow[]           @relation("UserFollowers")
+  following         Follow[]           @relation("UserFollowing")
+
+  @@index([email])
+  @@index([username])
+  @@index([isCreator])
+}
+
+// ==================== REFRESH TOKEN MODEL ====================
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+// ==================== COMMUNITY MODEL ====================
+model Community {
+  id            String    @id @default(uuid())
+  name          String
+  nameMm        String?
+  description   String
+  descriptionMm String?
+  avatar        String?
+  banner        String?
+  category      String
+  isPaid        Boolean   @default(false)
+  entryFee      Int?
+  creatorId     String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  creator  User              @relation("CommunityCreator", fields: [creatorId], references: [id])
+  members  CommunityMember[]
+  channels Channel[]
+  promotionalPosts Post[]    @relation("PromotedCommunity")
+
+  @@index([creatorId])
+  @@index([category])
+}
+
+// ==================== COMMUNITY MEMBER MODEL ====================
+enum MemberRole {
+  OWNER         // Full control, cannot be removed
+  ADMIN         // Can manage members, channels, and settings
+  MODERATOR     // Can delete messages, warn/mute users
+  MEMBER        // Regular member with default permissions
+}
+
+model CommunityMember {
+  id          String     @id @default(uuid())
+  userId      String
+  communityId String
+  role        MemberRole @default(MEMBER)
+  joinedAt    DateTime   @default(now())
+  
+  // Telegram-like Permissions
+  canSendMessages      Boolean @default(true)
+  canSendMedia         Boolean @default(true)
+  canSendStickers      Boolean @default(true)
+  canSendPolls         Boolean @default(true)
+  canAddMembers        Boolean @default(false)
+  canPinMessages       Boolean @default(false)
+  canChangeInfo        Boolean @default(false)
+  canDeleteMessages    Boolean @default(false)
+  canBanUsers          Boolean @default(false)
+  canManageChannels    Boolean @default(false)
+  
+  // Restrictions
+  isBanned      Boolean   @default(false)
+  isMuted       Boolean   @default(false)
+  mutedUntil    DateTime?
+  bannedAt      DateTime?
+  bannedBy      String?
+  banReason     String?
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, communityId])
+  @@index([userId])
+  @@index([communityId])
+  @@index([role])
+}
+
+// ==================== CHANNEL MODEL ====================
+enum ChannelType {
+  TEXT
+  VOICE
+  VIDEO
+}
+
+model Channel {
+  id          String      @id @default(uuid())
+  name        String
+  nameMm      String?
+  type        ChannelType @default(TEXT)
+  communityId String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@index([communityId])
+}
+
+// ==================== MESSAGE MODEL ====================
+model Message {
+  id          String    @id @default(uuid())
+  content     String?
+  channelId   String
+  userId      String
+  edited      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  channel      Channel       @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  files        File[]
+  readReceipts ReadReceipt[]
+
+  @@index([channelId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ==================== READ RECEIPT MODEL ====================
+model ReadReceipt {
+  id        String   @id @default(uuid())
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@index([messageId])
+  @@index([userId])
+}
+
+// ==================== POST MODEL (NEWS FEED) ====================
+enum PostVisibility {
+  PUBLIC
+  FOLLOWERS
+  PRIVATE
+}
+
+enum PostType {
+  REGULAR       // Normal user post
+  PROMOTION     // Promoting community/course/challenge
+  ANNOUNCEMENT  // Important announcement
+}
+
+model Post {
+  id         String         @id @default(uuid())
+  content    String
+  contentMm  String?
+  userId     String
+  type       PostType       @default(REGULAR)
+  visibility PostVisibility @default(PUBLIC)
+  
+  // For Promotional Posts
+  promotedCommunityId String?  // If promoting a community
+  promotedCourseId    String?  // If promoting a course (stored as reference)
+  promotedChallengeId String?  // If promoting a challenge
+  
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  // Relations
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  files     File[]
+  likes     Like[]
+  reactions Reaction[]
+  comments  Comment[]
+  shares    Share[]
+  promotedCommunity Community? @relation("PromotedCommunity", fields: [promotedCommunityId], references: [id], onDelete: SetNull)
+  promotedChallenge Challenge? @relation("PromotedChallenge", fields: [promotedChallengeId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([type])
+  @@index([visibility])
+}
+
+// ==================== COMMENT MODEL ====================
+model Comment {
+  id        String    @id @default(uuid())
+  content   String
+  postId    String
+  userId    String
+  parentId  String?   // For nested replies
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  post     Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  Comment[] @relation("CommentReplies")
+  likes    Like[]
+
+  @@index([postId])
+  @@index([userId])
+  @@index([parentId])
+}
+
+// ==================== LIKE MODEL ====================
+enum LikeType {
+  POST
+  COMMENT
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String?
+  commentId String?
+  type      LikeType
+  createdAt DateTime @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@unique([userId, commentId])
+  @@index([userId])
+  @@index([postId])
+  @@index([commentId])
+}
+
+// ==================== REACTION MODEL (for posts) ====================
+enum ReactionEmoji {
+  LIKE
+  LOVE
+  HAHA
+  WOW
+  SAD
+  ANGRY
+}
+
+model Reaction {
+  id        String        @id @default(uuid())
+  userId    String
+  postId    String
+  emoji     ReactionEmoji
+  createdAt DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+// ==================== SHARE MODEL ====================
+model Share {
+  id        String   @id @default(uuid())
+  userId    String
+  postId    String
+  caption   String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([postId])
+}
+
+// ==================== FILE MODEL ====================
+enum FileType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+  AUDIO
+}
+
+model File {
+  id           String    @id @default(uuid())
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  url          String
+  publicId     String?   // Cloudinary public ID
+  type         FileType
+  userId       String
+  messageId    String?
+  postId       String?
+  createdAt    DateTime  @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message Message? @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([messageId])
+  @@index([postId])
+}
+
+// ==================== CHALLENGE MODEL ====================
+enum ChallengeStatus {
+  ACTIVE
+  JUDGING
+  COMPLETED
+  CANCELLED
+}
+
+model Challenge {
+  id            String          @id @default(uuid())
+  title         String
+  titleMm       String?
+  description   String
+  descriptionMm String?
+  creatorId     String
+  thumbnail     String?
+  deadline      DateTime
+  prize         String?
+  prizeMm       String?
+  category      String
+  categoryMm    String?
+  status        ChallengeStatus @default(ACTIVE)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  // Relations
+  creator     User                  @relation("ChallengeCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  submissions ChallengeSubmission[]
+  promotionalPosts Post[]            @relation("PromotedChallenge")
+
+  @@index([creatorId])
+  @@index([status])
+  @@index([deadline])
+  @@index([category])
+}
+
+// ==================== CHALLENGE SUBMISSION MODEL ====================
+model ChallengeSubmission {
+  id          String   @id @default(uuid())
+  challengeId String
+  userId      String
+  content     String?
+  contentMm   String?
+  attachments String[] // Array of file URLs
+  score       Int?     // Judge's score
+  feedback    String?  // Judge's feedback
+  feedbackMm  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([challengeId, userId])
+  @@index([challengeId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ==================== DIRECT MESSAGE MODELS (Private Chat) ====================
+model DirectConversation {
+  id        String   @id @default(uuid())
+  user1Id   String   // First user in conversation
+  user2Id   String   // Second user in conversation
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages DirectMessage[]
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id])
+  @@index([user2Id])
+}
+
+model DirectMessage {
+  id             String             @id @default(uuid())
+  conversationId String
+  senderId       String
+  content        String?
+  edited         Boolean            @default(false)
+  read           Boolean            @default(false)
+  readAt         DateTime?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  conversation DirectConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([createdAt])
+}
+
+// ==================== CREATOR REQUEST MODEL ====================
+enum CreatorRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model CreatorRequest {
+  id          String               @id @default(uuid())
+  userId      String
+  reason      String               // Why they want to be a creator
+  reasonMm    String?
+  portfolio   String?              // Link to portfolio/work
+  category    String               // What they will create (courses, communities, etc)
+  status      CreatorRequestStatus @default(PENDING)
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  reviewNotes String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  user User @relation("CreatorRequests", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ==================== FOLLOW MODEL (User Following) ====================
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String   // User who is following
+  followingId String   // User being followed (usually a creator)
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
