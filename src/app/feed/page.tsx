@@ -44,10 +44,10 @@ export default function FeedPage() {
             ]);
 
             if (feedRes.success) {
-                setPosts(feedRes.data || []);
+                setPosts((feedRes.data || []) as any[]);
             }
             if (challengesRes.success) {
-                setChallenges(challengesRes.data || []);
+                setChallenges((challengesRes.data || []) as any[]);
             }
         } catch (error) {
             console.error("Failed to fetch feed data:", error);
