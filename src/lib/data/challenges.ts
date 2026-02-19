@@ -11,8 +11,8 @@ export const challenges: Challenge[] = [
         creatorName: "Thiri Maung",
         thumbnail: "/images/challenges/web-design.jpg",
         deadline: "2024-03-31T23:59:59Z",
-        prize: "$500 Cash Prize + Featured on MYC.mm",
-        prizeMm: "$500 ငွေဆုနှင့် MYC.mm တွင် ဖော်ပြခြင်း",
+        prize: "$500 Cash Prize + Featured on MYD",
+        prizeMm: "$500 ငွေဆုနှင့် MYD တွင် ဖော်ပြခြင်း",
         submissions: [
             {
                 id: "sub-001",
@@ -89,8 +89,8 @@ export const challenges: Challenge[] = [
         creatorName: "Kyaw Zin Latt",
         thumbnail: "/images/challenges/writing.jpg",
         deadline: "2024-03-20T23:59:59Z",
-        prize: "Publication on MYC.mm Blog + $200",
-        prizeMm: "MYC.mm Blog တွင် ထုတ်ဝေခြင်းနှင့် $200",
+        prize: "Publication on MYD Blog + $200",
+        prizeMm: "MYD Blog တွင် ထုတ်ဝေခြင်းနှင့် $200",
         submissions: [],
         status: "ACTIVE",
         category: "Content",

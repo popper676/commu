@@ -75,7 +75,7 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1">{t("contact.email")}</h3>
-                                        <p className="text-xl text-gray-900 font-bold">hello@myc.mm</p>
+                                        <p className="text-xl text-gray-900 font-bold">hello@myd.com</p>
                                     </div>
                                 </div>
 
@@ -179,7 +179,7 @@ export default function ContactPage() {
                             </svg>
                         </div>
                         <div className="px-8 py-4 bg-white rounded-3xl shadow-2xl border border-gray-100 text-center relative z-10">
-                            <p className="font-outfit font-black text-gray-900 text-2xl tracking-tight leading-none mb-1">MYC Headquarters</p>
+                            <p className="font-outfit font-black text-gray-900 text-2xl tracking-tight leading-none mb-1">MYD Headquarters</p>
                             <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Downtown Yangon, Myanmar</p>
                         </div>
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border border-gold-400/30 rounded-full animate-ping" />

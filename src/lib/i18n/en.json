@@ -13,14 +13,14 @@
     "createNew": "Create New"
   },
   "hero": {
-    "titleLine1": "Connect With",
-    "titleHighlight": "Myanmar Youth",
+    "titleLine1": "Make",
+    "titleHighlight": "Make Your Dreams",
     "titleDot": ".",
-    "subtitle": "Join Myanmar's largest youth community. Learn new skills, attend events, find opportunities, and build meaningful connections.",
+    "subtitle": "Make Your Dreams a reality. Learn new skills, attend events, find opportunities, and build meaningful connections.",
     "cta": "Join Our Community",
     "ctaPlaceholder": "Enter your email to get started",
     "start": "Start",
-    "membersCount": "Join 10,000+ Myanmar youth"
+    "membersCount": "Join 10,000+ dreamers"
   },
   "howItWorks": {
     "title": "It's Simple.",
@@ -46,7 +46,7 @@
   },
   "audience": {
     "title": "Built for",
-    "highlight": "Myanmar Youth",
+    "highlight": "Dreamers & Doers",
     "roles": [
       "Students",
       "Developers",
@@ -61,7 +61,7 @@
   },
   "cta": {
     "title": "Ready to Connect?",
-    "subtitle": "Join thousands of Myanmar youth building their future together.",
+    "subtitle": "Join thousands of dreamers building their future together.",
     "button": "Get Started Now"
   },
   "communities": {
@@ -83,7 +83,7 @@
   },
   "resources": {
     "title": "Resources",
-    "subtitle": "Free learning materials curated for Myanmar youth.",
+    "subtitle": "Free learning materials curated for you.",
     "readMore": "Read More",
     "watch": "Watch",
     "enroll": "Enroll",
@@ -105,11 +105,11 @@
   },
   "about": {
     "title": "About Us",
-    "subtitle": "We are building Myanmar's largest youth community platform.",
+    "subtitle": "We are building the largest youth community platform.",
     "mission": "Our Mission",
-    "missionText": "To empower Myanmar's youth by providing a platform for connection, learning, and growth. We believe in the power of community to transform lives and build a brighter future for Myanmar.",
+    "missionText": "To empower youth by providing a platform for connection, learning, and growth. We believe in the power of community to transform lives and build a brighter future — Make Your Dreams.",
     "vision": "Our Vision",
-    "visionText": "A connected, skilled, and empowered generation of Myanmar youth leading positive change in their communities and beyond.",
+    "visionText": "A connected, skilled, and empowered generation of youth leading positive change in their communities and beyond.",
     "values": "Our Values",
     "value1": "Community First",
     "value1Desc": "Everything we do is centered around building meaningful connections.",
@@ -127,7 +127,7 @@
     }
   },
   "footer": {
-    "tagline": "Connecting Myanmar Youth",
+    "tagline": "Make Your Dreams",
     "platform": "Platform",
     "features": "Features",
     "guides": "Guides",
@@ -170,7 +170,7 @@
     "login": "Welcome Back",
     "loginSubtitle": "Login to your account to continue your journey.",
     "signup": "Create Account",
-    "signupSubtitle": "Join the largest Myanmar youth community today.",
+    "signupSubtitle": "Join the MYD community and make your dreams real.",
     "email": "Email Address",
     "password": "Password",
     "confirmPassword": "Confirm Password",

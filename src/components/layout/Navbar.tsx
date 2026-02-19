@@ -51,7 +51,7 @@ export default function Navbar() {
                 <path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2zm0 4a4 4 0 110 8 4 4 0 010-8zm0 20c-3.866 0-7.282-1.953-9.318-4.926C8.63 18.594 13.144 17 16 17s7.37 1.594 9.318 4.074C23.282 24.047 19.866 26 16 26z" />
               </svg>
               <span className="text-xl font-black text-black font-outfit uppercase tracking-tighter">
-                MYC<span className="text-gold-500">.mm</span>
+                MYD<span className="text-gold-500"> - Make Your Dreams</span>
               </span>
             </Link>
             <GlobalSearch />

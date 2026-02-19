@@ -16,9 +16,9 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "MYC.mm - Myanmar Youth Community",
+  title: "MYD - Make Your Dreams",
   description:
-    "Join Myanmar's largest youth community. Learn new skills, attend events, find opportunities, and build meaningful connections.",
+    "Make Your Dreams. Learn new skills, attend events, find opportunities, and build meaningful connections.",
 };
 
 import { ToastProvider } from "@/contexts/ToastContext";
